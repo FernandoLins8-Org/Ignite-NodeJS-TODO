@@ -13,13 +13,13 @@ const users = [];
 // MIddleware to check if username is already registered
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers
-  const userAlreadyExists = users.find(user => user.username === username)
+  const user = users.find(user => user.username === username)
 
-  if(!userAlreadyExists) {
+  if(!user) {
     return response.status(400).json({ error: 'User do not exists' })
   }
   
-  request.username = username
+  request.user = user
   return next()
 }
 
@@ -45,15 +45,14 @@ app.post('/users', (request, response) => {
 
 // Get a user's todos
 app.get('/todos', checksExistsUserAccount, (request, response) => {
-  const { username } = request.headers
-  const user = users.find(user => user.username === username)
+  const { user } = request
   return response.json(user.todos)
 })
 
 // Create todo for a user
 app.post('/todos', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body
-  const username = request.headers.username
+  const { user } = request
 
   const newTodo = {
     id: uuidv4(),
@@ -63,7 +62,6 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
     created_at: new Date()
   }
 
-  const user = users.find(user => user.username === username)
   user.todos.push(newTodo)
 
   return response.status(201).json(newTodo)
@@ -72,10 +70,9 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 // Update a user's todo
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body
-  const { username } = request.headers
+  const { user } = request
   const { id: alteredTodoId } = request.params
 
-  const user = users.find(user => user.username === username)
   const todo = user.todos.find(todo => todo.id === alteredTodoId)
 
   if(!todo) {
@@ -90,10 +87,9 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 
 // Mark a todo as done
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  const { username } = request.headers
+  const { user } = request
   const { id: todoDoneId } = request.params
 
-  const user = users.find(user => user.username === username)
   const todo = user.todos.find(todo => todo.id === todoDoneId)
 
   if(!todo) {
@@ -107,10 +103,9 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 
 // Delete a user's todo
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  const { username } = request.headers
+  const { user } = request
   const { id: removedTodoId } = request.params
 
-  const user = users.find(user => user.username === username)
   const todo = user.todos.find(todo => todo.id === removedTodoId)
 
   if(!todo) {
