@@ -83,7 +83,7 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   title.deadline = deadline
 
   return response.status(201).json(todo)
-});
+})
 
 // Mark a todo as done
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
@@ -99,7 +99,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   todo.done = true
   
   return response.json(todo)
-});
+})
 
 // Delete a user's todo
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -115,6 +115,6 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   user.todos.splice(todo, 1)
 
   return response.status(204).send()
-});
+})
 
 module.exports = app;
